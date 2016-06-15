@@ -1,5 +1,5 @@
 # cannonball_kalman_matlab
-_Estimation of Cannon ball trajectry using Kalman Filter in Matlab
+_Estimation of Cannon ball trajectry using Kalman Filter in Matlab_
 
 ## What the project is?
 This project performs two main taks:
@@ -10,8 +10,9 @@ This project performs two main taks:
 This project was created as a university project.
 
 ## Usage
-* To run this project, download all the matlab source files in a workable directory
-* Open matlab and add this directly in your path.
+To run this project:
+* Download all the matlab source files in a working directory.
+* Open Matlab and add this directly in your path.
 * Run "cannon_ball_kalman.m" file.
 
 ## Reference
@@ -34,4 +35,4 @@ If you can find any mistake in the project and would like to correct it, you are
 ## License
 Right now, this project is not using any license since I made this for educational purposes and would be happy if this can be useful for other engineers. If you think I should use a license then please let me know or email me.
 
-_Matlab is a software by MathWorks.
+_Matlab is a software by MathWorks._
