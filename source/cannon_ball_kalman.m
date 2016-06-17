@@ -23,7 +23,10 @@ timeslice = 0.1; % How many seconds should elapse per iteration?
 iterations = 144; % How many iterations should the simulation run for?
 % (notice that the full journey takes 14.416 seconds, so 145 iterations will
 % cover the whole thing when timeslice = 0.10)
-noiselevel = 30;  % How much noise should we add to the noisy measurements?
+
+gravity = [0,-9.81];
+wind = [0,0];
+noiselevel = 5;  % How much noise should we add to the noisy measurements?
 muzzle_velocity = 100; % How fast should the cannonball come out?
 clc;
 
@@ -39,10 +42,10 @@ ky = zeros(iterations);
 
 
 % Let's make a cannon simulation.
-c = Cannon(timeslice,noiselevel)
+c = Cannon(angle, muzzle_velocity, gravity, wind, timeslice,noiselevel)
 
-speedX = muzzle_velocity*cosd(angle);
-speedY = muzzle_velocity*sind(angle);
+speedX = 1000; %muzzle_velocity*cosd(angle);
+speedY = 1000; %muzzle_velocity*sind(angle);
 
 % This is the state transition vector, which represents part of the kinematics.
 % 1, ts, 0,  0  =>  x(n+1) = x(n) + vx(n)
@@ -58,7 +61,7 @@ control_matrix = [0,0,0,0; 0,0,0,0; 0,0,1,0; 0,0,0,1]
 % 0          => vx(n+1) = vx(n+1)
 % -9.81*ts^2 =>  y(n+1) =  y(n+1) + 0.5*-9.81*ts^2
 % -9.81*ts   => vy(n+1) = vy(n+1) + -9.81*ts
-control_vector = [0; 0; 0.5*-9.81*timeslice*timeslice; -9.81*timeslice]
+control_vector = [0; 0; 0.5*gravity(1,2)*timeslice*timeslice; gravity(1,2)*timeslice]
 
 % After state transition and control, here are the equations:
 %  x(n+1) = x(n) + vx(n)
@@ -73,7 +76,7 @@ observation_matrix = eye(4)
 
 % This is our guess of the initial state.  I intentionally set the Y value
 % wrong to illustrate how fast the Kalman filter will pick up on that.
-initial_state = [0; speedX; 500; speedY]
+initial_state = [0; speedX; 300; speedY]
 
 initial_probability = eye(4)
 
@@ -86,30 +89,23 @@ kf = KalmanFilterLinear(state_transition, control_matrix, observation_matrix, in
 for i = 1: iterations
     x(i) = c.GetX();
     y(i) = c.GetY();
-    newestX = c.GetXWithNoise();
-    newestY = c.GetYWithNoise();
-    nx(i) = newestX;
-    ny(i) = newestY;
+    nx(i) = c.GetXWithNoise();
+    ny(i) = c.GetYWithNoise();
     % Iterate the cannon simulation to the next timeslice.
     
     c.Step();
-    cur_state = kf.GetCurrentState();
+    cur_state = kf.GetCurrentState()
     kx(i) = cur_state(1,1);
     ky(i) = cur_state(3,1);
-    measurement_vector = [newestX; c.GetXVelocity(); newestY; c.GetYVelocity()];
+    measurement_vector = [nx(i);c.GetXVelocity();ny(i);c.GetYVelocity()];
     kf.Step(control_vector, measurement_vector);
 end
-% Plot all the results we got.
-%plot(x,y, 'r+');
-%plot(kx,ky, 'g-');
-%plot(nx,ny, 'b+ ');
 
+% Plot all the results we got.
 figure(1);
 subplot(111);
 hold off
-plot(x,y,'g-',nx,ny,'r+',kx,ky,'b+');
+plot(x,y,'g-',nx,ny,'r-',kx,ky,'b-');
 xlabel('X position');
 ylabel('Y position');
-title('Measurement of a Cannonball in Flight');
-%legend(('true','measured','kalman'))
-%pylab.show()
+title('Measurement of a Cannonball in Flight with 4 times noise level');

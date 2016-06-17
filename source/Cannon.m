@@ -4,6 +4,7 @@ classdef Cannon < handle
       angle % The angle from the ground to point the cannon.
       muzzle_velocity % Muzzle velocity of the cannon.
       gravity % A vector containing gravitational acceleration.
+      wind % A vector containing wind force
       velocity % The initial velocity of the cannonball
       loc % The initial location of the cannonball.
       acceleration % The initial acceleration of the cannonball.
@@ -12,21 +13,16 @@ classdef Cannon < handle
     end
       %---------------------------------METHODS-----------------------------------
   methods
-      function obj = Cannon(time_slice,noise_level)
+      function obj = Cannon(angle, muzzle_velocity, gravity, wind, time_slice,noise_level)
         obj.timeslice = time_slice;
         obj.noiselevel = noise_level;
-        obj.angle = 45;
-        obj.muzzle_velocity = 100;
-        obj.gravity = [0,-9.81];
+        obj.angle = angle;
+        obj.muzzle_velocity = muzzle_velocity;
+        obj.gravity = gravity;
+        obj.wind = wind;
         obj.velocity = [obj.muzzle_velocity*cos(obj.angle*pi/180), obj.muzzle_velocity*sin(obj.angle*pi/180)];
-        obj.loc = [0, 0]; % The initial location of the cannonball.
-        obj.acceleration = [0,0]; % The initial acceleration of the cannonball.
-      end
-      function r = add(x,y)
-        r = x + y;
-      end
-      function r = mult(x,y)
-        r =x * y;
+        obj.loc = [0 0]; % The initial location of the cannonball.
+        obj.acceleration = [0 0]; % The initial acceleration of the cannonball.
       end
       function r = GetX(obj)
         r = obj.loc(1, 1);
@@ -50,17 +46,26 @@ classdef Cannon < handle
       % Increment through the next timeslice of the simulation.
       function Step(obj)
         % We're gonna use this vector to timeslice everything.
-        timeslicevec = [obj.timeslice;obj.timeslice];
-        % Break gravitational force into a smaller time slice.
-        sliced_gravity = obj.gravity*timeslicevec;
-        % The only force on the cannonball is gravity.
-        sliced_acceleration = sliced_gravity;
-        % Apply the acceleration to velocity.
-        obj.velocity = [obj.velocity(1,1) obj.velocity(1,2)+sliced_acceleration];
-        sliced_velocity = [obj.velocity(1,1) obj.velocity(1,2)*obj.timeslice];
-        % Apply the velocity to location.
+        %timeslicevec = [obj.timeslice;obj.timeslice];
         
-        obj.loc = obj.loc+sliced_velocity;
+        % Break gravitational force into a smaller time slice.
+        sliced_gravity = [obj.gravity(1,1)*obj.timeslice obj.gravity(1,2)*obj.timeslice];
+        
+        % Break wind force into a smaller time slice.
+        sliced_wind = [obj.wind(1,1)*obj.timeslice obj.wind(1,2)*obj.timeslice];
+        
+        % The only force on the cannonball is gravity.
+        sliced_acceleration = sliced_gravity + sliced_wind;
+        
+        % Apply the acceleration to velocity.
+        obj.velocity = [obj.velocity(1,1)+sliced_acceleration(1,1) obj.velocity(1,2)+sliced_acceleration(1,2)];
+        
+        % Break velocity into a smaller time slice.
+        sliced_velocity = [obj.velocity(1,1)*obj.timeslice obj.velocity(1,2)*obj.timeslice];
+        
+        % Apply the time sliced velocity to location.
+        obj.loc = [obj.loc(1,1)+sliced_velocity(1,1) obj.loc(1,2)+sliced_velocity(1,2)];
+        
         % Cannonballs shouldn't go into the ground.
         if obj.loc(1,2) < 0
           obj.loc(1,2) = 0;

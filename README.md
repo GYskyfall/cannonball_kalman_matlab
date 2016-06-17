@@ -1,7 +1,6 @@
-# cannonball_kalman_matlab
-_Estimation of Cannon ball trajectry using Kalman Filter in Matlab_
+##_Estimation of Cannon ball trajectry using Kalman Filter in Matlab_
 
-## What the project is?
+## Introduction
 This project performs two main taks:
 * Simulation of cannon ball projectile motion (trajectry).
 * Implementation of a multi-variable linear Kalman filter which is then used to estimate the trajectory of cannon ball.
@@ -33,6 +32,6 @@ This project is based on a great tutorial on cannon ball trajectory which can be
 If you can find any mistake in the project and would like to correct it, you are free to do so. I would greatly appreciate it.
 
 ## License
-Right now, this project is not using any license since I made this for educational purposes and would be happy if this can be useful for other engineers. If you think I should use a license then please let me know or email me.
+I made this for educational purposes and would be happy if this can be useful for other engineers. This project is completely open-source, you may copy it, modify it, reuse it for your own work. But you must not use this for commercial purposes. 
 
 _Matlab is a software by MathWorks._
