@@ -1,28 +1,39 @@
 classdef Cannon < handle
     properties
       %--------------------------------VARIABLES----------------------------------
-      angle % The angle from the ground to point the cannon.
-      muzzle_velocity % Muzzle velocity of the cannon.
-      gravity % A vector containing gravitational acceleration.
-      wind % A vector containing wind force
-      velocity % The initial velocity of the cannonball
-      loc % The initial location of the cannonball.
-      acceleration % The initial acceleration of the cannonball.
-      timeslice
-      noiselevel
+      angle             % The angle from the ground to point the cannon.
+      muzzle_velocity   % Muzzle velocity of the cannon.
+      gravity           % A vector containing gravitational acceleration.
+      wind              % A vector containing wind force
+      velocity          % The initial velocity of the cannonball
+      loc               % The initial location of the cannonball.
+      acceleration      % The initial acceleration of the cannonball.
+      timeslice         % The timeslice (dt)
+      noiselevel        % Maximum noise added to the original measurements.
     end
       %---------------------------------METHODS-----------------------------------
   methods
       function obj = Cannon(angle, muzzle_velocity, gravity, wind, time_slice,noise_level)
+        
         obj.timeslice = time_slice;
         obj.noiselevel = noise_level;
         obj.angle = angle;
         obj.muzzle_velocity = muzzle_velocity;
+        
+        % parameters which affect the speed of cannon ball in flight
         obj.gravity = gravity;
         obj.wind = wind;
-        obj.velocity = [obj.muzzle_velocity*cos(obj.angle*pi/180), obj.muzzle_velocity*sin(obj.angle*pi/180)];
-        obj.loc = [0 0]; % The initial location of the cannonball.
-        obj.acceleration = [0 0]; % The initial acceleration of the cannonball.
+        
+        % Initial velocity:
+        % Vx = velocity*cos(angle)
+        % Vy = velocity*sin(angle)
+        obj.velocity = [obj.muzzle_velocity*cosd(obj.angle), obj.muzzle_velocity*sind(obj.angle)];
+        
+        % The initial location of the cannonball.
+        obj.loc = [0 0];
+        
+        % The initial acceleration of the cannonball.
+        obj.acceleration = [0 0]; 
       end
       function r = GetX(obj)
         r = obj.loc(1, 1);
